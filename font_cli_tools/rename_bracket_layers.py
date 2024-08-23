@@ -5,8 +5,8 @@ import re
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--font", type=Font)
-parser.add_argument("--designspace", type=DesignSpaceDocument.fromfile)
+parser.add_argument("font", type=Font)
+parser.add_argument("designspace", type=DesignSpaceDocument.fromfile)
 parser.add_argument("--appendix", type=str, default="rvrn")
 
 args = parser.parse_args()

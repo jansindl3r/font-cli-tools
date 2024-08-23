@@ -56,41 +56,44 @@ def line_shape(pen, point_a, point_b, thickness):
 class XRayPen(AbstractPen):
     def __init__(
         self,
+        point_layer,
         handle_line_layer,
-        handle_layer,
         line_width=2,
         point_size=10,
         handle_size=5,
         use_components=False,
         handle_component_name=None,
-        point_component_name=None,
-    ):
+        point_component_name=None
+        ):
+        self.point_layer = point_layer
         self.handle_line_layer = handle_line_layer
-        self.handle_layer = handle_layer
         self.line_width = line_width
         self.point_size = point_size
         self.handle_size = handle_size
         self.use_components = use_components
         self.handle_component_name = handle_component_name
         self.point_component_name = point_component_name
+
+        if use_components:
+            assert handle_component_name is not None and point_component_name is not None, "Component for \"point\" and \"handle\" must be provided when using components. The output layers need to have access to the \"glyphSet\" as well."
+
         self.last_point = None
-        pass
 
     def handle(self, point):
         if self.use_components:
-            self.handle_layer.addComponent(
+            self.point_layer.addComponent(
                 self.handle_component_name, (1, 0, 0, 1, point[0], point[1])
             )
         else:
-            circle(self.handle_layer, point, self.handle_size, tension=0.66)
+            circle(self.point_layer, point, self.handle_size, tension=0.66)
 
     def point(self, point):
         if self.use_components:
-            self.handle_layer.addComponent(
+            self.point_layer.addComponent(
                 self.point_component_name, (1, 0, 0, 1, point[0], point[1])
             )
         else:
-            square(self.handle_layer, point, self.point_size)
+            square(self.point_layer, point, self.point_size)
 
     def moveTo(self, point):
         self.point(point)
@@ -120,6 +123,5 @@ class XRayPen(AbstractPen):
         self.last_point = points[-1]
 
     def addComponent(self, glyph_name, transformation, **kwargs) -> None:
-        # self.handle_line_layer.addComponent(glyph_name, transformation)
-        # self.handle_layer.addComponent(glyph_name, transformation)
-        pass
+        self.handle_line_layer.addComponent(glyph_name, transformation)
+        self.point_layer.addComponent(glyph_name, transformation)
